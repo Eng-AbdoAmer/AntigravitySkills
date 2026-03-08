@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة المهارات - Skills Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .skill-card {
+            transition: all 0.3s ease;
+            border-right: 4px solid transparent;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-right-color: #667eea;
+        }
+
+        .category-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .highlight {
+            background-color: #fef08a;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .category-section {
+            scroll-margin-top: 100px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        .nav-btn {
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="pb-20">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass-effect shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center text-white text-2xl shadow-lg">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">مكتبة المهارات</h1>
+                        <p class="text-sm text-gray-600">AI Skills Library - antigravity-awesome-skills</p>
+                    </div>
+                </div>
+
+                <!-- Search Box -->
+                <div class="relative w-full md:w-96">
+                    <input type="text" id="searchInput" placeholder="ابحث عن مهارة، موضوع، أو وصف..."
+                        class="search-input w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 focus:outline-none focus:border-purple-500 text-right transition-all">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="flex flex-wrap gap-4 mt-4 justify-center md:justify-start text-sm text-gray-600">
+                <span class="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200">
+                    <i class="fas fa-layer-group ml-1 text-purple-600"></i>
+                    <span id="totalCategories">0</span> تصنيف
+                </span>
+                <span class="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200">
+                    <i class="fas fa-code ml-1 text-blue-600"></i>
+                    <span id="totalSkills">0</span> مهارة
+                </span>
+                <span class="bg-white px-3 py-1 rounded-full shadow-sm border border-gray-200 hidden" id="searchStats">
+                    <i class="fas fa-filter ml-1 text-green-600"></i>
+                    نتائج البحث: <span id="searchResults">0</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quick Navigation -->
+    <nav class="container mx-auto px-4 mt-6">
+        <div class="glass-effect rounded-2xl p-4 shadow-lg">
+            <h3 class="text-lg font-bold mb-3 text-gray-800 border-b pb-2">التنقل السريع بين التصنيفات</h3>
+            <div class="flex flex-wrap gap-2" id="quickNav">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 mt-8 space-y-8" id="content">
+        <!-- Content will be generated by JavaScript -->
+    </main>
+
+    <!-- Scroll to Top -->
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+        class="fixed bottom-6 left-6 bg-purple-600 text-white w-12 h-12 rounded-full shadow-lg hover:bg-purple-700 transition-all flex items-center justify-center z-50 hover:scale-110">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Data Structure with Category Names
+        const skillsData = [
+            {
+                id: "apis",
+                title: "واجهات البرمجة APIs",
+                subtitle: "تصميم، أمان، وإدارة APIs",
+                description: "كل المهارات المتعلقة بتصميم واجهات البرمجة (APIs) وأمانها واختبارها، بالإضافة إلى أدوات مثل Apify و Azure API Management.",
+                icon: "fa-plug",
+                color: "blue",
+                skills: [
+                    { name: "@api-design-principles", desc: "مبادئ تصميم APIs فعالة وRESTful.", benefit: "تضمن APIs سهلة الاستخدام وقابلة للتوسع.", usage: "Design an API using @api-design-principles." },
+                    { name: "@api-documentation-generator", desc: "توليد وثائق APIs أوتوماتيكي.", benefit: "توفر وقت في كتابة docs مثل Swagger.", usage: "Generate API docs with @api-documentation-generator." },
+                    { name: "@api-documentation", desc: "كتابة وثائق APIs واضحة.", benefit: "تحسن التواصل مع المطورين.", usage: "Write API documentation using @api-documentation." },
+                    { name: "@api-documenter", desc: "توثيق APIs بأدوات متقدمة.", benefit: "تجعل APIs أكثر احترافية.", usage: "Document this API with @api-documenter." },
+                    { name: "@api-endpoint-builder", desc: "بناء endpoints لـ APIs.", benefit: "تسرع تطوير الـ backend.", usage: "Build API endpoints with @api-endpoint-builder." },
+                    { name: "@api-fuzzing-bug-bounty", desc: "فحص ثغرات APIs بـ fuzzing.", benefit: "اكتشاف bugs أمنية.", usage: "Fuzz test API for vulnerabilities using @api-fuzzing-bug-bounty." },
+                    { name: "@api-patterns", desc: "أنماط تصميم APIs شائعة.", benefit: "تحسن الهيكلة.", usage: "Apply API patterns with @api-patterns." },
+                    { name: "@api-security-best-practices", desc: "أفضل ممارسات أمان APIs.", benefit: "حماية من هجمات مثل injection.", usage: "Secure API with @api-security-best-practices." },
+                    { name: "@api-security-testing", desc: "اختبار أمان APIs.", benefit: "ضمان سلامة البيانات.", usage: "Test API security using @api-security-testing." },
+                    { name: "@api-testing-observability-api-mock", desc: "اختبار APIs مع mocks وmonitoring.", benefit: "تحسن الاختبار والمراقبة.", usage: "Mock and test API with @api-testing-observability-api-mock." },
+                    { name: "@apify-actor-development", desc: "تطوير actors لـ Apify (web scraping).", benefit: "أتمتة جمع البيانات.", usage: "Develop Apify actor using @apify-actor-development." },
+                    { name: "@apify-actorization", desc: "تحويل scripts إلى Apify actors.", benefit: "تسهيل الـ scraping.", usage: "Actorize script with @apify-actorization." },
+                    { name: "@apify-audience-analysis", desc: "تحليل الجمهور عبر Apify.", benefit: "فهم السوق.", usage: "Analyze audience with @apify-audience-analysis." },
+                    { name: "@apify-brand-reputation-monitoring", desc: "مراقبة سمعة العلامة.", benefit: "حماية البرند.", usage: "Monitor brand with @apify-brand-reputation-monitoring." },
+                    { name: "@apify-competitor-intelligence", desc: "جمع معلومات عن المنافسين.", benefit: "استراتيجيات أفضل.", usage: "Gather competitor intel with @apify-competitor-intelligence." },
+                    { name: "@apify-content-analytics", desc: "تحليل المحتوى.", benefit: "تحسين الـ content.", usage: "Analyze content with @apify-content-analytics." },
+                    { name: "@apify-ecommerce", desc: "Scraping لـ e-commerce.", benefit: "تحليل الأسعار.", usage: "Scrape e-commerce data with @apify-ecommerce." },
+                    { name: "@apify-influencer-discovery", desc: "اكتشاف influencers.", benefit: "حملات تسويقية.", usage: "Discover influencers with @apify-influencer-discovery." },
+                    { name: "@apify-lead-generation", desc: "توليد leads.", benefit: "زيادة المبيعات.", usage: "Generate leads with @apify-lead-generation." },
+                    { name: "@apify-trend-analysis", desc: "تحليل الاتجاهات.", benefit: "توقع السوق.", usage: "Analyze trends with @apify-trend-analysis." },
+                    { name: "@apify-ultimate-scraper", desc: "Scraper متقدم لـ Apify.", benefit: "جمع بيانات كبيرة.", usage: "Use ultimate scraper with @apify-ultimate-scraper." },
+                    { name: "@azure-mgmt-apicenter-dotnet", desc: "إدارة API Center في Azure بـ .NET.", benefit: "تنظيم APIs في Azure.", usage: "Manage Azure API Center with @azure-mgmt-apicenter-dotnet." },
+                    { name: "@azure-mgmt-apicenter-py", desc: "نفسها بس بـ Python.", benefit: "لمطوري Python.", usage: "Manage API Center in Python with @azure-mgmt-apicenter-py." },
+                    { name: "@azure-mgmt-apimanagement-dotnet", desc: "إدارة API Management في Azure بـ .NET.", benefit: "نشر وأمان APIs.", usage: "Use API Management with @azure-mgmt-apimanagement-dotnet." },
+                    { name: "@azure-mgmt-apimanagement-py", desc: "نفسها بـ Python.", benefit: "لـ Python devs.", usage: "Manage API Management in Python with @azure-mgmt-apimanagement-py." }
+                ]
+            },
+            {
+                id: "azure",
+                title: "منصة Azure السحابية",
+                subtitle: "الذكاء الاصطناعي والتخزين والإدارة",
+                description: "مهارات تطوير وإدارة الموارد على منصة Microsoft Azure، تشمل الذكاء الاصطناعي، قواعد البيانات، التخزين، والأمان.",
+                icon: "fa-cloud",
+                color: "indigo",
+                skills: [
+                    { name: "@azure-ai-agents-persistent-dotnet", desc: "بناء AI agents دائمة في Azure بـ .NET.", benefit: "Agents مستقرة.", usage: "Build persistent AI agent with @azure-ai-agents-persistent-dotnet." },
+                    { name: "@azure-ai-agents-persistent-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Use @azure-ai-agents-persistent-java for Java agents." },
+                    { name: "@azure-ai-anomalydetector-java", desc: "كشف anomalies في Azure بـ Java.", benefit: "اكتشاف مشاكل.", usage: "Detect anomalies with @azure-ai-anomalydetector-java." },
+                    { name: "@azure-ai-contentsafety-java", desc: "أمان المحتوى بـ Java.", benefit: "فلترة محتوى.", usage: "Apply content safety with @azure-ai-contentsafety-java." },
+                    { name: "@azure-ai-contentsafety-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-ai-contentsafety-py." },
+                    { name: "@azure-ai-contentsafety-ts", desc: "نفسها بـ TypeScript.", benefit: "لـ JS/TS.", usage: "Content safety with @azure-ai-contentsafety-ts." },
+                    { name: "@azure-ai-contentunderstanding-py", desc: "فهم المحتوى بـ Python.", benefit: "تحليل نصوص.", usage: "Understand content with @azure-ai-contentunderstanding-py." },
+                    { name: "@azure-ai-document-intelligence-dotnet", desc: "ذكاء الوثائق بـ .NET.", benefit: "استخراج بيانات من docs.", usage: "Process documents with @azure-ai-document-intelligence-dotnet." },
+                    { name: "@azure-ai-document-intelligence-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-ai-document-intelligence-ts." },
+                    { name: "@azure-ai-formrecognizer-java", desc: "التعرف على نماذج بـ Java.", benefit: "OCR لنماذج.", usage: "Recognize forms with @azure-ai-formrecognizer-java." },
+                    { name: "@azure-ai-ml-py", desc: "Machine Learning في Azure بـ Python.", benefit: "بناء نماذج ML.", usage: "Build ML models with @azure-ai-ml-py." },
+                    { name: "@azure-ai-openai-dotnet", desc: "OpenAI في Azure بـ .NET.", benefit: "دمج AI.", usage: "Integrate OpenAI with @azure-ai-openai-dotnet." },
+                    { name: "@azure-ai-projects-dotnet", desc: "مشاريع AI في Azure بـ .NET.", benefit: "تطوير مشاريع.", usage: "Develop AI projects with @azure-ai-projects-dotnet." },
+                    { name: "@azure-ai-projects-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Use @azure-ai-projects-java." },
+                    { name: "@azure-ai-projects-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "AI projects with @azure-ai-projects-py." },
+                    { name: "@azure-ai-projects-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-ai-projects-ts." },
+                    { name: "@azure-ai-textanalytics-py", desc: "تحليل نصوص بـ Python.", benefit: "Sentiment analysis.", usage: "Analyze text with @azure-ai-textanalytics-py." },
+                    { name: "@azure-ai-transcription-py", desc: "نقل صوت إلى نص بـ Python.", benefit: "Transcription.", usage: "Transcribe audio with @azure-ai-transcription-py." },
+                    { name: "@azure-ai-translation-document-py", desc: "ترجمة وثائق بـ Python.", benefit: "ترجمة docs.", usage: "Translate documents with @azure-ai-translation-document-py." },
+                    { name: "@azure-ai-translation-text-py", desc: "ترجمة نصوص بـ Python.", benefit: "ترجمة عامة.", usage: "Translate text with @azure-ai-translation-text-py." },
+                    { name: "@azure-ai-translation-ts", desc: "ترجمة بـ TS.", benefit: "لـ TS.", usage: "Use @azure-ai-translation-ts." },
+                    { name: "@azure-ai-vision-imageanalysis-java", desc: "تحليل صور بـ Java.", benefit: "Computer vision.", usage: "Analyze images with @azure-ai-vision-imageanalysis-java." },
+                    { name: "@azure-ai-vision-imageanalysis-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Image analysis with @azure-ai-vision-imageanalysis-py." },
+                    { name: "@azure-ai-voicelive-dotnet", desc: "صوت حي في Azure بـ .NET.", benefit: "Voice apps.", usage: "Live voice with @azure-ai-voicelive-dotnet." },
+                    { name: "@azure-ai-voicelive-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Use @azure-ai-voicelive-java." },
+                    { name: "@azure-ai-voicelive-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Live voice with @azure-ai-voicelive-py." },
+                    { name: "@azure-ai-voicelive-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-ai-voicelive-ts." },
+                    { name: "@azure-appconfiguration-java", desc: "تكوين التطبيقات بـ Java.", benefit: "إدارة configs.", usage: "Configure app with @azure-appconfiguration-java." },
+                    { name: "@azure-appconfiguration-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-appconfiguration-py." },
+                    { name: "@azure-appconfiguration-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "App config with @azure-appconfiguration-ts." },
+                    { name: "@azure-communication-callautomation-java", desc: "أتمتة مكالمات بـ Java.", benefit: "Communication apps.", usage: "Automate calls with @azure-communication-callautomation-java." },
+                    { name: "@azure-communication-callingserver-java", desc: "خادم مكالمات بـ Java.", benefit: "Voice servers.", usage: "Call server with @azure-communication-callingserver-java." },
+                    { name: "@azure-communication-chat-java", desc: "Chat في Azure بـ Java.", benefit: "بناء chats.", usage: "Build chat with @azure-communication-chat-java." },
+                    { name: "@azure-communication-common-java", desc: "أدوات عامة بـ Java.", benefit: "لـ communication.", usage: "Use common tools with @azure-communication-common-java." },
+                    { name: "@azure-communication-sms-java", desc: "SMS بـ Java.", benefit: "إرسال رسائل.", usage: "Send SMS with @azure-communication-sms-java." },
+                    { name: "@azure-compute-batch-java", desc: "معالجة batch بـ Java.", benefit: "Jobs كبيرة.", usage: "Batch compute with @azure-compute-batch-java." },
+                    { name: "@azure-containerregistry-py", desc: "إدارة containers بـ Python.", benefit: "Registry.", usage: "Manage containers with @azure-containerregistry-py." },
+                    { name: "@azure-cosmos-db-py", desc: "Cosmos DB بـ Python.", benefit: "NoSQL database.", usage: "Use Cosmos DB with @azure-cosmos-db-py." },
+                    { name: "@azure-cosmos-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Cosmos with @azure-cosmos-java." },
+                    { name: "@azure-cosmos-py", desc: "نفسها.", benefit: "لـ Python.", usage: "Use @azure-cosmos-py." },
+                    { name: "@azure-cosmos-rust", desc: "نفسها بـ Rust.", benefit: "لـ Rust.", usage: "Cosmos with @azure-cosmos-rust." },
+                    { name: "@azure-cosmos-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-cosmos-ts." },
+                    { name: "@azure-data-tables-java", desc: "جداول بـ Java.", benefit: "Storage.", usage: "Tables with @azure-data-tables-java." },
+                    { name: "@azure-data-tables-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-data-tables-py." },
+                    { name: "@azure-eventgrid-dotnet", desc: "Event Grid بـ .NET.", benefit: "Events.", usage: "Event Grid with @azure-eventgrid-dotnet." },
+                    { name: "@azure-eventgrid-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Use @azure-eventgrid-java." },
+                    { name: "@azure-eventgrid-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Event Grid with @azure-eventgrid-py." },
+                    { name: "@azure-eventhub-dotnet", desc: "Event Hub بـ .NET.", benefit: "Streaming.", usage: "Event Hub with @azure-eventhub-dotnet." },
+                    { name: "@azure-eventhub-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Use @azure-eventhub-java." },
+                    { name: "@azure-eventhub-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Event Hub with @azure-eventhub-py." },
+                    { name: "@azure-eventhub-rust", desc: "نفسها بـ Rust.", benefit: "لـ Rust.", usage: "Use @azure-eventhub-rust." },
+                    { name: "@azure-eventhub-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Event Hub with @azure-eventhub-ts." },
+                    { name: "@azure-functions", desc: "Functions في Azure.", benefit: "Serverless.", usage: "Build functions with @azure-functions." },
+                    { name: "@azure-identity-dotnet", desc: "هوية في Azure بـ .NET.", benefit: "Auth.", usage: "Identity with @azure-identity-dotnet." },
+                    { name: "@azure-identity-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Use @azure-identity-java." },
+                    { name: "@azure-identity-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Identity with @azure-identity-py." },
+                    { name: "@azure-identity-rust", desc: "نفسها بـ Rust.", benefit: "لـ Rust.", usage: "Use @azure-identity-rust." },
+                    { name: "@azure-identity-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Identity with @azure-identity-ts." },
+                    { name: "@azure-keyvault-certificates-rust", desc: "KeyVault certificates بـ Rust.", benefit: "أمان.", usage: "Certificates with @azure-keyvault-certificates-rust." },
+                    { name: "@azure-keyvault-keys-rust", desc: "Keys بـ Rust.", benefit: "أمان.", usage: "Keys with @azure-keyvault-keys-rust." },
+                    { name: "@azure-keyvault-keys-ts", desc: "Keys بـ TS.", benefit: "لـ TS.", usage: "Use @azure-keyvault-keys-ts." },
+                    { name: "@azure-keyvault-py", desc: "KeyVault بـ Python.", benefit: "Secrets.", usage: "KeyVault with @azure-keyvault-py." },
+                    { name: "@azure-keyvault-secrets-rust", desc: "Secrets بـ Rust.", benefit: "أمان.", usage: "Secrets with @azure-keyvault-secrets-rust." },
+                    { name: "@azure-keyvault-secrets-ts", desc: "Secrets بـ TS.", benefit: "لـ TS.", usage: "Use @azure-keyvault-secrets-ts." },
+                    { name: "@azure-messaging-webpubsub-java", desc: "WebPubSub بـ Java.", benefit: "Realtime.", usage: "WebPubSub with @azure-messaging-webpubsub-java." },
+                    { name: "@azure-messaging-webpubsubservice-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-messaging-webpubsubservice-py." },
+                    { name: "@azure-mgmt-applicationinsights-dotnet", desc: "Application Insights بـ .NET.", benefit: "Monitoring.", usage: "Insights with @azure-mgmt-applicationinsights-dotnet." },
+                    { name: "@azure-mgmt-arizeaiobservabilityeval-dotnet", desc: "Observability بـ .NET.", benefit: "Eval.", usage: "Use @azure-mgmt-arizeaiobservabilityeval-dotnet." },
+                    { name: "@azure-mgmt-botservice-dotnet", desc: "Bot Service بـ .NET.", benefit: "Bots.", usage: "Bot service with @azure-mgmt-botservice-dotnet." },
+                    { name: "@azure-mgmt-botservice-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-mgmt-botservice-py." },
+                    { name: "@azure-mgmt-fabric-dotnet", desc: "Fabric بـ .NET.", benefit: "Data.", usage: "Fabric with @azure-mgmt-fabric-dotnet." },
+                    { name: "@azure-mgmt-fabric-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-mgmt-fabric-py." },
+                    { name: "@azure-mgmt-mongodbatlas-dotnet", desc: "MongoDB Atlas بـ .NET.", benefit: "Database.", usage: "Mongo Atlas with @azure-mgmt-mongodbatlas-dotnet." },
+                    { name: "@azure-mgmt-weightsandbiases-dotnet", desc: "Weights and Biases بـ .NET.", benefit: "ML.", usage: "W&B with @azure-mgmt-weightsandbiases-dotnet." },
+                    { name: "@azure-microsoft-playwright-testing-ts", desc: "Playwright testing بـ TS.", benefit: "Testing.", usage: "Testing with @azure-microsoft-playwright-testing-ts." },
+                    { name: "@azure-monitor-ingestion-java", desc: "Ingestion في Monitor بـ Java.", benefit: "Logs.", usage: "Ingestion with @azure-monitor-ingestion-java." },
+                    { name: "@azure-monitor-ingestion-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-monitor-ingestion-py." },
+                    { name: "@azure-monitor-opentelemetry-exporter-java", desc: "Exporter بـ Java.", benefit: "Telemetry.", usage: "Exporter with @azure-monitor-opentelemetry-exporter-java." },
+                    { name: "@azure-monitor-opentelemetry-exporter-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-monitor-opentelemetry-exporter-py." },
+                    { name: "@azure-monitor-opentelemetry-py", desc: "OpenTelemetry بـ Python.", benefit: "Monitoring.", usage: "OpenTelemetry with @azure-monitor-opentelemetry-py." },
+                    { name: "@azure-monitor-opentelemetry-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-monitor-opentelemetry-ts." },
+                    { name: "@azure-monitor-query-java", desc: "Queries بـ Java.", benefit: "استفسارات.", usage: "Query monitor with @azure-monitor-query-java." },
+                    { name: "@azure-monitor-query-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-monitor-query-py." },
+                    { name: "@azure-postgres-ts", desc: "Postgres في Azure بـ TS.", benefit: "Database.", usage: "Postgres with @azure-postgres-ts." },
+                    { name: "@azure-resource-manager-cosmosdb-dotnet", desc: "CosmosDB manager بـ .NET.", benefit: "إدارة.", usage: "Manage Cosmos with @azure-resource-manager-cosmosdb-dotnet." },
+                    { name: "@azure-resource-manager-durabletask-dotnet", desc: "Durable Tasks بـ .NET.", benefit: "Workflows.", usage: "Durable tasks with @azure-resource-manager-durabletask-dotnet." },
+                    { name: "@azure-resource-manager-mysql-dotnet", desc: "MySQL manager بـ .NET.", benefit: "Database.", usage: "MySQL with @azure-resource-manager-mysql-dotnet." },
+                    { name: "@azure-resource-manager-playwright-dotnet", desc: "Playwright manager بـ .NET.", benefit: "Testing.", usage: "Playwright with @azure-resource-manager-playwright-dotnet." },
+                    { name: "@azure-resource-manager-postgresql-dotnet", desc: "PostgreSQL manager بـ .NET.", benefit: "Database.", usage: "PostgreSQL with @azure-resource-manager-postgresql-dotnet." },
+                    { name: "@azure-resource-manager-redis-dotnet", desc: "Redis manager بـ .NET.", benefit: "Cache.", usage: "Redis with @azure-resource-manager-redis-dotnet." },
+                    { name: "@azure-resource-manager-sql-dotnet", desc: "SQL manager بـ .NET.", benefit: "Database.", usage: "SQL with @azure-resource-manager-sql-dotnet." },
+                    { name: "@azure-security-keyvault-keys-dotnet", desc: "KeyVault keys بـ .NET.", benefit: "أمان.", usage: "Keys with @azure-security-keyvault-keys-dotnet." },
+                    { name: "@azure-security-keyvault-keys-java", desc: "نفسها بـ Java.", benefit: "لـ Java.", usage: "Use @azure-security-keyvault-keys-java." },
+                    { name: "@azure-security-keyvault-secrets-java", desc: "Secrets بـ Java.", benefit: "أمان.", usage: "Secrets with @azure-security-keyvault-secrets-java." },
+                    { name: "@azure-servicebus-dotnet", desc: "Service Bus بـ .NET.", benefit: "Messaging.", usage: "Service Bus with @azure-servicebus-dotnet." },
+                    { name: "@azure-servicebus-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-servicebus-py." },
+                    { name: "@azure-servicebus-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Service Bus with @azure-servicebus-ts." },
+                    { name: "@azure-speech-to-text-rest-py", desc: "Speech to Text بـ Python.", benefit: "Transcription.", usage: "Speech to text with @azure-speech-to-text-rest-py." },
+                    { name: "@azure-storage-blob-java", desc: "Blob storage بـ Java.", benefit: "Storage.", usage: "Blob with @azure-storage-blob-java." },
+                    { name: "@azure-storage-blob-py", desc: "نفسها بـ Python.", benefit: "لـ Python.", usage: "Use @azure-storage-blob-py." },
+                    { name: "@azure-storage-blob-rust", desc: "نفسها بـ Rust.", benefit: "لـ Rust.", usage: "Blob with @azure-storage-blob-rust." },
+                    { name: "@azure-storage-blob-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-storage-blob-ts." },
+                    { name: "@azure-storage-file-datalake-py", desc: "File DataLake بـ Python.", benefit: "Storage.", usage: "DataLake with @azure-storage-file-datalake-py." },
+                    { name: "@azure-storage-file-share-py", desc: "File Share بـ Python.", benefit: "Storage.", usage: "File share with @azure-storage-file-share-py." },
+                    { name: "@azure-storage-file-share-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-storage-file-share-ts." },
+                    { name: "@azure-storage-queue-py", desc: "Queues بـ Python.", benefit: "Messaging.", usage: "Queues with @azure-storage-queue-py." },
+                    { name: "@azure-storage-queue-ts", desc: "نفسها بـ TS.", benefit: "لـ TS.", usage: "Use @azure-storage-queue-ts." },
+                    { name: "@azure-web-pubsub-ts", desc: "Web PubSub بـ TS.", benefit: "Realtime.", usage: "Web PubSub with @azure-web-pubsub-ts." },
+                    { name: "@azd-deployment", desc: "نشر بـ Azure Developer CLI.", benefit: "نشر سهل.", usage: "Deploy with @azd-deployment." }
+                ]
+            },
+            {
+                id: "aws",
+                title: "منصة AWS السحابية",
+                subtitle: "الخوادم بدون إدارة والأمان",
+                description: "مهارات العمل على منصة Amazon Web Services، تشمل الحوسبة بدون خادم (Serverless)، تحسين التكاليف، والأمان.",
+                icon: "fa-aws",
+                color: "orange",
+                skills: [
+                    { name: "@aws-cost-cleanup", desc: "تنظيف التكاليف في AWS.", benefit: "توفير فلوس.", usage: "Cleanup AWS costs with @aws-cost-cleanup." },
+                    { name: "@aws-cost-optimizer", desc: "تحسين التكاليف.", benefit: "تقليل الفواتير.", usage: "Optimize costs with @aws-cost-optimizer." },
+                    { name: "@aws-penetration-testing", desc: "اختبار اختراق في AWS.", benefit: "أمان.", usage: "Pen test AWS with @aws-penetration-testing." },
+                    { name: "@aws-serverless", desc: "بناء serverless في AWS.", benefit: "تطبيقات بدون خوادم.", usage: "Build serverless with @aws-serverless." },
+                    { name: "@aws-skills", desc: "مهارات عامة في AWS.", benefit: "أساسيات.", usage: "Use AWS skills with @aws-skills." }
+                ]
+            },
+            {
+                id: "code-review",
+                title: "مراجعة الكود وإعادة الهيكلة",
+                subtitle: "الجودة والتنظيف والتوثيق",
+                description: "مهارات تحسين جودة الكود البرمجي، إعادة الهيكلة (Refactoring)، المراجعة البرمجية، وإدارة الديون التقنية.",
+                icon: "fa-code-branch",
+                color: "green",
+                skills: [
+                    { name: "@clean-code", desc: "كتابة كود نظيف.", benefit: "كود سهل الصيانة.", usage: "Apply clean code with @clean-code." },
+                    { name: "@code-documentation-code-explain", desc: "شرح الكود.", benefit: "فهم أفضل.", usage: "Explain code with @code-documentation-code-explain." },
+                    { name: "@code-documentation-doc-generate", desc: "توليد docs للكود.", benefit: "وثائق.", usage: "Generate docs with @code-documentation-doc-generate." },
+                    { name: "@code-refactoring-context-restore", desc: "استعادة سياق الـ refactor.", benefit: "تحسين.", usage: "Restore context with @code-refactoring-context-restore." },
+                    { name: "@code-refactoring-refactor-clean", desc: "Refactor لكود نظيف.", benefit: "تنظيف.", usage: "Refactor with @code-refactoring-refactor-clean." },
+                    { name: "@code-refactoring-tech-debt", desc: "إدارة الديون الفنية.", benefit: "حل مشاكل قديمة.", usage: "Handle tech debt with @code-refactoring-tech-debt." },
+                    { name: "@code-review-ai-ai-review", desc: "مراجعة كود بـ AI.", benefit: "مراجعة أوتوماتيك.", usage: "AI review with @code-review-ai-ai-review." },
+                    { name: "@code-review-checklist", desc: "قائمة فحص لمراجعة.", benefit: "ضمان جودة.", usage: "Use checklist with @code-review-checklist." },
+                    { name: "@code-review-excellence", desc: "مراجعة متقدمة.", benefit: "جودة عالية.", usage: "Excel in review with @code-review-excellence." },
+                    { name: "@code-reviewer", desc: "مراجع عام.", benefit: "فحص الكود.", usage: "Review code with @code-reviewer." },
+                    { name: "@code-simplifier", desc: "تبسيط الكود.", benefit: "كود أبسط.", usage: "Simplify with @code-simplifier." },
+                    { name: "@codebase-audit-pre-push", desc: "فحص codebase قبل push.", benefit: "منع أخطاء.", usage: "Audit before push with @codebase-audit-pre-push." },
+                    { name: "@codebase-cleanup-deps-audit", desc: "تنظيف dependencies.", benefit: "تحديث deps.", usage: "Cleanup deps with @codebase-cleanup-deps-audit." },
+                    { name: "@codebase-cleanup-refactor-clean", desc: "تنظيف codebase.", benefit: "تحسين.", usage: "Cleanup codebase with @codebase-cleanup-refactor-clean." },
+                    { name: "@codebase-cleanup-tech-debt", desc: "ديون فنية في codebase.", benefit: "حل.", usage: "Handle debt with @codebase-cleanup-tech-debt." },
+                    { name: "@codex-review", desc: "مراجعة codex.", benefit: "فحص.", usage: "Review with @codex-review." }
+                ]
+            },
+            {
+                id: "database",
+                title: "قواعد البيانات",
+                subtitle: "التصميم والإدارة والتحسين",
+                description: "مهارات العمل مع قواعد البيانات، تشمل التصميم، الهجرة، التحسين، وإدارة التكاليف السحابية.",
+                icon: "fa-database",
+                color: "teal",
+                skills: [
+                    { name: "@database-admin", desc: "إدارة databases.", benefit: "صيانة.", usage: "Admin DB with @database-admin." },
+                    { name: "@database-architect", desc: "تصميم databases.", benefit: "هيكلة.", usage: "Design DB with @database-architect." },
+                    { name: "@database-cloud-optimization-cost-optimize", desc: "تحسين تكاليف cloud DB.", benefit: "توفير.", usage: "Optimize DB costs with @database-cloud-optimization-cost-optimize." },
+                    { name: "@database-design", desc: "تصميم schemas.", benefit: "جودة.", usage: "Design database with @database-design." },
+                    { name: "@database-migration", desc: "Migrations.", benefit: "نقل بيانات.", usage: "Migrate DB with @database-migration." },
+                    { name: "@database-migrations-migration-observability", desc: "مراقبة migrations.", benefit: "سلامة.", usage: "Observe migrations with @database-migrations-migration-observability." },
+                    { name: "@database-migrations-sql-migrations", desc: "SQL migrations.", benefit: "تحديث.", usage: "SQL migrate with @database-migrations-sql-migrations." },
+                    { name: "@database-optimizer", desc: "تحسين أداء.", benefit: "سرعة.", usage: "Optimize DB with @database-optimizer." },
+                    { name: "@database", desc: "مهارات عامة.", benefit: "أساسيات.", usage: "Use DB skills with @database." }
+                ]
+            },
+            {
+                id: "agent-ai",
+                title: "الوكلاء الذكيين والذكاء الاصطناعي",
+                subtitle: "بناء وإدارة أنظمة AI المتقدمة",
+                description: "مهارات تطوير الوكلاء الذكيين (AI Agents)، الأنظمة المستقلة، التنسيق بين الوكلاء، وتطبيقات الذكاء الاصطناعي المتقدمة.",
+                icon: "fa-robot",
+                color: "purple",
+                skills: [
+                    { name: "@agent-evaluation", desc: "تقييم agents.", benefit: "تحسين.", usage: "Evaluate agent with @agent-evaluation." },
+                    { name: "@agent-framework-azure-ai-py", desc: "Framework لـ agents في Azure Python.", benefit: "بناء.", usage: "Build agent with @agent-framework-azure-ai-py." },
+                    { name: "@agent-manager-skill", desc: "إدارة agents.", benefit: "تنظيم.", usage: "Manage agents with @agent-manager-skill." },
+                    { name: "@agent-memory-mcp", desc: "ذاكرة agents.", benefit: "تذكر.", usage: "Memory with @agent-memory-mcp." },
+                    { name: "@agent-memory-systems", desc: "أنظمة ذاكرة.", benefit: "استمرارية.", usage: "Use memory systems with @agent-memory-systems." },
+                    { name: "@agent-orchestration-improve-agent", desc: "تحسين orchestration.", benefit: "كفاءة.", usage: "Improve agent with @agent-orchestration-improve-agent." },
+                    { name: "@agent-orchestration-multi-agent-optimize", desc: "Optimize multi-agents.", benefit: "متعدد.", usage: "Optimize multi with @agent-orchestration-multi-agent-optimize." },
+                    { name: "@agent-orchestrator", desc: "Orchestration.", benefit: "تنسيق.", usage: "Orchestrate with @agent-orchestrator." },
+                    { name: "@agent-tool-builder", desc: "بناء tools لـ agents.", benefit: "توسيع.", usage: "Build tool with @agent-tool-builder." },
+                    { name: "@agentfolio", desc: "Portfolio لـ agents.", benefit: "عرض.", usage: "Use @agentfolio." },
+                    { name: "@agentic-actions-auditor", desc: "فحص actions.", benefit: "أمان.", usage: "Audit actions with @agentic-actions-auditor." },
+                    { name: "@agents-md", desc: "Agents في Markdown.", benefit: "وثائق.", usage: "Document agents with @agents-md." },
+                    { name: "@agents-v2-py", desc: "Agents v2 بـ Python.", benefit: "متقدم.", usage: "Use v2 agents with @agents-v2-py." },
+                    { name: "@ai-agent-development", desc: "تطوير AI agents.", benefit: "بناء.", usage: "Develop AI agent with @ai-agent-development." },
+                    { name: "@ai-agents-architect", desc: "تصميم agents.", benefit: "معماري.", usage: "Architect agents with @ai-agents-architect." },
+                    { name: "@ai-analyzer", desc: "تحليل AI.", benefit: "فحص.", usage: "Analyze AI with @ai-analyzer." },
+                    { name: "@ai-engineer", desc: "هندسة AI.", benefit: "تطوير.", usage: "Engineer AI with @ai-engineer." },
+                    { name: "@ai-ml", desc: "AI و ML.", benefit: "أساسيات.", usage: "Use AI ML with @ai-ml." },
+                    { name: "@ai-product", desc: "منتجات AI.", benefit: "بناء منتجات.", usage: "Build AI product with @ai-product." },
+                    { name: "@ai-studio-image", desc: "AI للصور.", benefit: "توليد.", usage: "Generate images with @ai-studio-image." },
+                    { name: "@ai-wrapper-product", desc: "Wrappers لـ AI.", benefit: "دمج.", usage: "Wrap AI with @ai-wrapper-product." },
+                    { name: "@autonomous-agent-patterns", desc: "أنماط agents مستقلة.", benefit: "تصميم.", usage: "Apply patterns with @autonomous-agent-patterns." },
+                    { name: "@autonomous-agents", desc: "Agents مستقلة.", benefit: "أتمتة.", usage: "Build autonomous with @autonomous-agents." },
+                    { name: "@computer-use-agents", desc: "Agents لاستخدام الكمبيوتر.", benefit: "تفاعل.", usage: "Use computer agents with @computer-use-agents." }
+                ]
+            }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function () {
+            renderContent();
+            updateStats();
+            setupSearch();
+            renderQuickNav();
+        });
+
+        function renderContent(filter = '') {
+            const container = document.getElementById('content');
+            container.innerHTML = '';
+
+            let totalResults = 0;
+
+            skillsData.forEach(category => {
+                const filteredSkills = category.skills.filter(skill =>
+                    skill.name.toLowerCase().includes(filter.toLowerCase()) ||
+                    skill.desc.toLowerCase().includes(filter.toLowerCase()) ||
+                    skill.benefit.toLowerCase().includes(filter.toLowerCase()) ||
+                    skill.usage.toLowerCase().includes(filter.toLowerCase())
+                );
+
+                if (filteredSkills.length === 0 && filter) return;
+
+                totalResults += filteredSkills.length;
+
+                const section = document.createElement('section');
+                section.className = `category-section glass-effect rounded-2xl p-6 shadow-lg fade-in mb-8`;
+                section.id = category.id;
+
+                const header = document.createElement('div');
+                header.className = 'flex items-center gap-3 mb-4 border-b pb-4';
+                header.innerHTML = `
+                    <div class="w-14 h-14 rounded-xl bg-${category.color}-100 text-${category.color}-600 flex items-center justify-center text-2xl shadow-sm">
+                        <i class="fas ${category.icon}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-gray-800">${category.title}</h2>
+                        <p class="text-sm text-${category.color}-600 font-semibold mt-1">${category.subtitle}</p>
+                        <p class="text-gray-600 mt-1 text-sm">${category.description}</p>
+                    </div>
+                    <span class="bg-${category.color}-100 text-${category.color}-700 px-3 py-1 rounded-full text-sm font-bold">
+                        ${filteredSkills.length}
+                    </span>
+                `;
+                section.appendChild(header);
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4';
+
+                filteredSkills.forEach(skill => {
+                    const card = createSkillCard(skill, filter);
+                    grid.appendChild(card);
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+
+            if (totalResults === 0 && filter) {
+                container.innerHTML = `
+                    <div class="text-center py-20">
+                        <i class="fas fa-search text-6xl text-gray-300 mb-4"></i>
+                        <p class="text-xl text-gray-500">لا توجد نتائج للبحث "${filter}"</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('searchStats').classList.toggle('hidden', !filter);
+            document.getElementById('searchResults').textContent = totalResults;
+        }
+
+        function createSkillCard(skill, highlightTerm) {
+            const card = document.createElement('div');
+            card.className = 'skill-card bg-white rounded-xl p-5 border border-gray-200 hover:border-purple-300 cursor-pointer group';
+
+            const copyText = skill.name;
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <code class="text-sm font-bold text-purple-700 bg-purple-50 px-2 py-1 rounded-lg border border-purple-200 group-hover:bg-purple-100 transition-colors">
+                        ${highlightText(skill.name, highlightTerm)}
+                    </code>
+                    <button onclick="copyToClipboard('${copyText}')" class="text-gray-400 hover:text-purple-600 transition-colors" title="نسخ">
+                        <i class="far fa-copy"></i>
+                    </button>
+                </div>
+                <p class="text-gray-700 mb-3 font-medium">${highlightText(skill.desc, highlightTerm)}</p>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2 text-sm text-green-700 bg-green-50 p-2 rounded-lg">
+                        <i class="fas fa-check-circle"></i>
+                        <span>${highlightText(skill.benefit, highlightTerm)}</span>
+                    </div>
+                    <div class="flex items-start gap-2 text-sm text-blue-700 bg-blue-50 p-2 rounded-lg">
+                        <i class="fas fa-terminal mt-1"></i>
+                        <code class="text-xs break-all">${highlightText(skill.usage, highlightTerm)}</code>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function highlightText(text, term) {
+            if (!term) return text;
+            const regex = new RegExp(`(${term})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            let debounceTimer;
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    renderContent(e.target.value);
+                }, 300);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalCategories').textContent = skillsData.length;
+            const totalSkills = skillsData.reduce((acc, cat) => acc + cat.skills.length, 0);
+            document.getElementById('totalSkills').textContent = totalSkills;
+        }
+
+        function renderQuickNav() {
+            const nav = document.getElementById('quickNav');
+            skillsData.forEach((cat, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-all text-sm font-medium shadow-sm flex items-center gap-2';
+                btn.innerHTML = `
+                    <i class="fas ${cat.icon} text-${cat.color}-500"></i>
+                    <span>${cat.title}</span>
+                `;
+                btn.onclick = () => {
+                    document.getElementById(cat.id).scrollIntoView({ behavior: 'smooth' });
+                };
+                nav.appendChild(btn);
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50 fade-in flex items-center gap-2';
+                toast.innerHTML = '<i class="fas fa-check text-green-400"></i> تم نسخ المهارة!';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>
